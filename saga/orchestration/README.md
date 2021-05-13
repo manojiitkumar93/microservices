@@ -14,7 +14,7 @@ service keeps track of the process and sends command messages to saga participan
 Payment Service . The CreateOrderSaga, reads reply messages from its reply channel and then determines the next step, if any, 
 in the saga.
 
----> **IMAGE** <----
+![orchestration](../images/orchestration.png)
 
 Order Service first initiates Create Order Saga orchestrator. After that, the flow for the happy path is as follows:
 1. The saga orchestrator sends a **create order initiation** command to Order Service.
@@ -41,7 +41,7 @@ implementing, and testing sagas easier.
 
 Below image shows the state machine model for the **CreateOrderSaga**
 
----> **IMAGE** <-------
+![stateMachine](../images/stateMachine.png)
 
 **NOte** : When Order Service initiates the CreateOrderSaga, first state in this flow is CreateOrderSaga sending command to Order Service to initiate the Order Creation by inserting the state **(APPROVAL_PENDING)** in its local database. As this step is always
 successfull we will not represented this state in the above diagram.
