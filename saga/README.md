@@ -54,6 +54,14 @@ To see how compensating transactions are used, imagine a scenario where the paym
 
 **Fourth step** is compensating transaction that undo the updates made by Order Microservice. A saga’s coordination logic is responsible for sequencing the execution of forward and compensating transactions.
 
+### Coordinating SAGA
+A saga’s implementation consists of logic that coordinates the steps of the saga. When a saga is initiated by system command, the coordination logic must select and tell the first saga participant to execute a local transaction. Once that transaction completes, the saga’s sequencing coordination selects and invokes the next saga participant. This process continues until the saga has executed all the steps. If any local transaction fails, the saga must execute the compensating transactions in reverse order. There are a couple of different ways to structure a saga’s coordination logic..
+
+- *Choreography* : Distribute the decision making and sequencing among the saga participants. They primarily communicate by exchanging events.
+
+- *Orchestration* : Centralize a saga’s coordination logic in a saga orchestrator class. A saga orchestrator sends command messages to saga participants telling them
+which operations to perform.
+
 
 
 
