@@ -43,6 +43,8 @@ Below image shows the state machine model for the **CreateOrderSaga**
 
 ---> **IMAGE** <-------
 
-**NOte** : When Order Service initiates the CreateOrderSaga, first state in this flow is CreateOrderSaga sending command to Order Service
-to initiate the Order Creation by inserting the state in its local database 
+**NOte** : When Order Service initiates the CreateOrderSaga, first state in this flow is CreateOrderSaga sending command to Order Service to initiate the Order Creation by inserting the state **(APPROVAL_PENDING)** in its local database. As this step is always
+successfull we will not represented this state in the above diagram.
+
+
 
