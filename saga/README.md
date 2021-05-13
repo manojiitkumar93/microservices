@@ -18,3 +18,48 @@ local database.
 SAGA pattern can be implemented in two different ways.
 1. Choreography SAGA
 2. Orchestration SAGA
+
+### AN Example SAGA : Create Order SAGA
+We look into Create Order operation using SAGA. When a user requests to createOrder/placeOrder, request first enters into Order Microservice which internally involves invoking other microservices. Below image shows the transactions involved in placing an Order.
+
+---> **IMAGE** <----
+
+
+**This SAGA consists of the following local transactions..**
+- Order Microservice --> Create a order in APPROVAL_PENDING state
+- Product Microservuce --> Verify for the availability of products
+- Payment Microservice --> Making payment for the Order.
+- Order Microservice --> Change the state of Order to APPROVED 
+
+**Working of SAGA**
+A service publishes a message when a local transaction completes. This message then triggers the next step in the saga. Not only does using messaging ensure the saga participants are loosely coupled, it also guarantees that a saga completes. That’s because if the recipient of a message is temporarily unavailable, the message broker buffers the message until it can be delivered.
+
+**How SAGA handles ROLL_BACK transactions**
+SAGAS use compensating transactions to ROLL_BACK changes. Our CreateOrder can fail due to..
+- Products out of stock
+- Error during payment process
+
+If a local transaction fails, the SAGA’s coordination mechanism must execute compensating transactions that reject the Order. It’s important to note that not all steps need **compensating transactions**.The steps such as **makePayment** that are followed by steps that always succeed.
+
+---> **IMAGE** <----
+
+- Steps (1) and (2) are compensatable transactions because if any of then fails then we need to reject the order. 
+- Step (3) is considered as pivot transaction because it is followed by the step that never fails.
+- Step (4) is retrible transactions because they always succeed.
+
+To see how compensating transactions are used, imagine a scenario where the payment process fails. In this scenario, the saga executes the following local transactions:
+- Order Microservice --> Create a order in APPROVAL_PENDING state
+- Product Microservuce --> Verify for the availability of products
+- Payment Microservice --> Making payment for the Order. Fails
+- Order Microservice --> Change the state of Order to REJECTED
+
+**Fourth step** is compensating transaction that undo the updates made by Order Microservice. A saga’s coordination logic is responsible for sequencing the execution of forward and compensating transactions.
+
+
+
+
+
+
+
+
+
