@@ -46,5 +46,13 @@ Below image shows the state machine model for the **CreateOrderSaga**
 **NOte** : When Order Service initiates the CreateOrderSaga, first state in this flow is CreateOrderSaga sending command to Order Service to initiate the Order Creation by inserting the state **(APPROVAL_PENDING)** in its local database. As this step is always
 successfull we will not represented this state in the above diagram.
 
+### SAGA Orchestration and Transactional Messaging
+Each step of an orchestration-based saga consists of a service updating a database and publishing a message. For example **CreateOrderSaga** orchestrator sends a message to the first saga participant **Order Service** to initiate the order creation 
+initiation. Order Service handles a command message by updating its database and sending a reply message. A service must use **transactional messaging** in order to atomically update the database and publish messages.
 
+### Benifits and Drawbacks of Orchestration-Based SAGA's
+Orchestration-based sagas have several benefits:
+- *Simpler dependencies*: One benefit of orchestration is that it doesn’t introduce cyclic dependencies. The saga orchestrator invokes the saga participants, but the participants don’t invoke the orchestrator. As a result, the orchestrator depends on the participants but not vice versa, and so there are no cyclic dependencies.
+- *Less coupling*: Each service implements an API that is invoked by the orchestrator, so it does not need to know about the events published by the saga participants.
+- *Improves separation of concerns and simplifies the business logic*: The saga coordination logic is localized in the saga orchestrator. The domain objects are simpler and have no knowledge of the sagas that they participate in. For example, when using orchestration, the Order class has no knowledge of any of the sagas, so it has a simpler state machine model. During the execution of the Create Order Saga , it transitions directly from the APPROVAL_PENDING state to the APPROVED state. The Order class doesn’t have any intermediate states corresponding to the steps of the saga. As a result, the business is much simpler.
 
